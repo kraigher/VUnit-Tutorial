@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>VUnit Tutorial</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -13,7 +13,10 @@
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
       }
-      .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+      .remark-code, .remark-inline-code {
+          font-family: 'Ubuntu Mono';
+      }
       .vunit-logo {
           border-radius: 6%;
           width: 30%;
@@ -42,6 +45,13 @@
           margin-top: 10px;
           height: 30px;
       }
+
+      .gui-image {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 80%;
+      }
     </style>
   </head>
   <body>
@@ -49,7 +59,7 @@
 
 class: center, middle
 
-<img class="vunit-logo", src="../vunit/docs/_static/vunit.svg" alt="VUnit logo"/>
+<img class="vunit-logo", src="vunit.svg" alt="VUnit logo"/>
 # VUnit Tutorial
 
 **Presenter:** Olof Kraigher <olof.kraigher@gmail.com>
@@ -57,7 +67,7 @@ class: center, middle
 ---
 
 layout: true
-<div class="my-header"><img src="../vunit/docs/_static/vunit.svg" /></div>
+<div class="my-header"><img src="vunit.svg" /></div>
 <div class="my-footer">
   <p>Olof Kraigher <a href="mailto:olof.kraigher@gmail.com">olof.kraigher@gmail.com</a>
 </p>
@@ -67,32 +77,666 @@ layout: true
 # Agenda
 
 1. Introduction
-2. Deep-dive
-3. ...
+
+2. What can VUnit do for you?
+
+3. What is VUnit exactly?
+
+3. VUnit basic example
+
+4. Beyond basics
+
+5. The libraries
 
 ---
 
 # Introduction
+- Provies an open source test automation tool for VHDL and SystemVerilog
 
+- Founded in 2014 by Olof Kraigher and Lars Asplund
+
+- Currently has thousands of users in major companies around the world
+
+- Active community with third party contributors
+
+- Rigorously tested using Travis CI on Linux and AppVeyor on Windows
+
+- Has a [website](https://vunit.github.io) and an active chat [channel](https://gitter.im/VUnit/vunit)
+
+---
+
+# What can VUnit do for you?
+
+- Provide a very convenient and productive edit/compile/run workflow.
+
+- Automatic compile order detection and incremental re-compilation
+
+- Automate and standardize the running of all test benches.
+
+- Integration with Continous Integration servers such as Jenkins and Bamboo.
+
+- Provides you with a toolbox to create higher quality automated test benches.
+
+- Lowers the threshold to write automated tests.
+
+---
+
+# What is VUnit exactly?
+
+VUnit is a set of related components written in Python, VHDL and SystemVerilog.
+The core parts are:
+
+- A Python library:
+
+  - Simple, documented and script-able API for end users.
+  - Test execution and results collection.
+  - Controlling and spawning of simulator processes.
+
+- A VHDL/SystemVerilog Test Runner.
+  - Allows test benches with multiple named test cases
+
+- A Logging/Check Library
+  - Provides high quality error and debug messages
+  - Colorized output for less strain on the eyes
+
+---
+
+# What is VUnit exactly?
+There are also a number of additional libraries.
+
+- Dynamic Data Types Library
+
+  - A push/pop anything queue
+  - A dynamic array with up to 3 dimensions
+- Message Passing library
+
+  - Pass dynamic messages between processes
+  - Is the basis of verification components
+- Verification Component Library
+
+  - AXI-stream, AXI4, AXI4-lite
+  - Avalon
+  - Wishbone
+  - ... and many more
+
+---
+
+# VUnit basic example
+
+**tb_example.vhd**
+```vhdl
+library vunit_lib;
+context vunit_lib.vunit_context;
+
+entity tb_example is
+  generic (runner_cfg : string);
+end entity;
+
+architecture tb of tb_example is
+begin
+  main : process
+  begin
+    test_runner_setup(runner, runner_cfg);
+    report "Hello world!";
+    test_runner_cleanup(runner); -- Simulation ends here
+  end process;
+end architecture;
+```
+
+---
+
+# VUnit basic example
+
+**run.py**
 ```python
 from vunit import VUnit
 
-prj = vunit.from_argv("hello")
+prj = VUnit.from_argv()
+
+lib = prj.add_library("lib")
+lib.add_source_files("PROJECT_ROOT/*.vhd"))
+
+prj.main()
 ```
+
+---
+
+# VUnit basic example
+**Console**
+<pre class="hljs remark-code">
+<font color="black"><b>></b></font> python run.py
+Compiling into lib: examples/vhdl/user_guide/tb_example.vhd <font color="#98C379"><b>passed</b></font>
+<font color="#98C379"><b>Compile passed</b></font>
+
+Starting lib.tb_example.all
+Output file: vunit_out/test_output/lib.tb_example.all/output.txt
+<font color="#98C379"><b>pass</b></font> (P=1 S=0 F=0 T=1) lib.tb_example.all (0.4 seconds)
+
+==== Summary ==============================
+<font color="#98C379"><b>pass</b></font> lib.tb_example.all (0.4 seconds)
+===========================================
+<font color="#98C379"><b>pass</b></font> 1 of 1
+===========================================
+Total time was 0.4 seconds
+Elapsed time was 0.4 seconds
+===========================================
+<font color="#98C379"><b>All passed!</b></font>
+</pre>
+
+---
+
+# VUnit basic example - making it fail
+**tb_example.vhd**
 ```vhdl
+library vunit_lib;
 context vunit_lib.vunit_context;
 
-entity tb_foo is
-  port (
-    clk : in std_logic);
+entity tb_example is
+  generic (runner_cfg : string);
 end entity;
 
-main : process
+architecture tb of tb_example is
 begin
-  test_runner_setup(runner, runner_cfg);
-  test_runner_cleanup(runner);
-end process;
+  main : process
+  begin
+    test_runner_setup(runner, runner_cfg);
+    assert false report "Fail";
+    test_runner_cleanup(runner); -- Simulation ends here
+  end process;
+end architecture;
 ```
+
+---
+
+# VUnit basic example - making it fail
+
+**Console**
+<pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py
+Compiling into lib: examples/vhdl/user_guide/tb_example.vhd <font color="#98C379"><b>passed</b></font>
+<font color="#98C379"><b>Compile passed</b></font>
+
+Starting lib.tb_example.all
+Output file: vunit_out/test_output/lib.tb_example.all/output.text
+tb_example.vhd:19:5:@0ms:(assertion error): Fail
+error: assertion failed
+  from: process lib.tb_example(tb).main at tb_example.vhd:13
+error: simulation failed
+<font color="#E06C75"><b>fail</b></font> (P=0 S=0 F=1 T=1) lib.tb_example.all (0.3 seconds)
+
+==== Summary ==============================
+<font color="#E06C75"><b>fail</b></font> lib.tb_example.all (0.3 seconds)
+===========================================
+<font color="#98C379"><b>pass</b></font> 0 of 1
+<font color="#E06C75"><b>fail</b></font> 1 of 1
+===========================================
+Total time was 0.3 seconds
+Elapsed time was 0.3 seconds
+===========================================
+<font color="#E06C75"><b>Some failed!</b></font>
+</pre>
+
+---
+
+# Multiple test cases
+VUnit supports having several test cases in a test bench.
+
+**tb_example_many.vhd**
+```vhdl
+  main : process
+  begin
+    test_runner_setup(runner, runner_cfg);
+
+    while test_suite loop
+
+      if run("test_pass") then
+        report "This will pass";
+
+      elsif run("test_fail") then
+        assert false report "It fails";
+
+      end if;
+    end loop;
+
+    test_runner_cleanup(runner);
+  end process;
+```
+
+---
+
+# Multiple test cases
+
+**Console**
+<pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py --quiet
+Re-compile not needed
+
+Starting lib.tb_example_many.test_pass
+Output file: vunit_out/test_output/lib.tb_example_many.test_pass/output.txt
+<font color="#98C379"><b>pass</b></font> (P=1 S=0 F=0 T=2) lib.tb_example_many.test_pass (0.4 seconds)
+
+Starting lib.tb_example_many.test_fail
+Output file: vunit_out/test_output/lib.tb_example_many.test_fail/output.txt
+<font color="#E06C75"><b>fail</b></font> (P=1 S=0 F=1 T=2) lib.tb_example_many.test_fail (0.4 seconds)
+
+==== Summary =========================================
+<font color="#98C379"><b>pass</b></font> lib.tb_example_many.test_pass (0.4 seconds)
+<font color="#E06C75"><b>fail</b></font> lib.tb_example_many.test_fail (0.4 seconds)
+======================================================
+<font color="#98C379"><b>pass</b></font> 1 of 2
+<font color="#E06C75"><b>fail</b></font> 1 of 2
+======================================================
+Total time was 0.7 seconds
+Elapsed time was 0.7 seconds
+======================================================
+<font color="#E06C75"><b>Some failed!</b></font>
+</pre>
+
+
+---
+
+# Launching the Simulator GUI
+
+Sometimes you want to use the simulator GUI to investigate why your
+test is <font color="#E06C75"><b>failing</b></font>.
+
+<pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py lib.tb_example.all --gui &
+</pre>
+
+---
+
+# Launching the Simulator GUI
+
+<img class="gui-image" src="riviera_gui.png"/>
+
+---
+
+# System Verilog
+**tb_example.sv**
+```verilog
+`include "vunit_defines.svh"
+
+module tb_example;
+   `TEST_SUITE begin
+      `TEST_CASE("Test case") begin
+         $display("Hello world");
+      end
+   end;
+endmodule
+```
+
+---
+
+# More examples
+The previous example and many more can be found on GitHub
+
+<https://github.com/VUnit/vunit/tree/master/examples>
+
+---
+
+# Beyond basics
+
+I will give an overview of some important advanced features
+
+- Test runner watchdog
+
+- Test configuration
+
+- Simulation and compile options
+
+- The output path
+
+- Pre and post simulation hooks
+
+- Parallel simulation
+
+- Attributes
+
+- Running several test in the same simulation
+
+- CI-server integration
+
+---
+
+# Test runner watchdog
+
+Often a faulty DUT or test bench run forever. It thus good practice to add a timeout.
+```vhdl
+  test_runner : process
+  begin
+    test_runner_setup(runner, runner_cfg);
+
+    while test_suite loop
+      if run("Test that stalls") then
+        -- The watchdog will fail this test in a reasonable time
+        wait;
+      elsif run("Test that needs longer timeout") then
+        -- It is also possible to set/re-set the timeout
+        -- when test cases need separate timeout settings
+        set_timeout(runner, 2 ms);
+        wait for 1 ms;
+      end if;
+    end loop;
+
+    test_runner_cleanup(runner);
+  end process;
+
+  test_runner_watchdog(runner, 1 ns);
+
+```
+---
+
+# Test configuration
+
+- For complex test benches or When developing re-usable IP blocks you
+may want to test them for several combination of generics.
+
+- VUnit supports running a test case several times with different configurations of generics.
+
+**run.py**
+```python
+# Use the API to get the test bench object
+tb_generic = lib.test_bench("tb_generic")
+
+# Test the cross product of data width and mode settings
+for data_width in [8, 16, 32]:
+    for mode in ["a", "b"]:
+        # Each configuration needs an unique name
+        name = "dw=%i,mode=%s" % (data_width, mode)
+
+        # Create the generics as a key-valu map
+        generics = dict(data_width=data_width, mode=mode)
+
+        # Add the configuration
+        tb_generic.add_config(name, generics)
+```
+---
+
+# Test configuration
+
+<pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py --list
+lib.tb_generic.dw=8,mode=a.Test 1
+lib.tb_generic.dw=8,mode=b.Test 1
+lib.tb_generic.dw=16,mode=a.Test 1
+lib.tb_generic.dw=16,mode=b.Test 1
+lib.tb_generic.dw=32,mode=a.Test 1
+lib.tb_generic.dw=32,mode=b.Test 1
+lib.tb_generic.dw=8,mode=a.Test 2
+lib.tb_generic.dw=8,mode=b.Test 2
+lib.tb_generic.dw=16,mode=a.Test 2
+lib.tb_generic.dw=16,mode=b.Test 2
+lib.tb_generic.dw=32,mode=a.Test 2
+lib.tb_generic.dw=32,mode=b.Test 2
+Listed 12 tests
+</pre>
+
+Configurations can be created both at test bench or test case granularity
+
+---
+
+# Simulation and compile options
+
+- VUnit supports transparently passing options to the simulator
+
+- Compile options are set on the file level
+
+- Simulation options are set on the test bench/configuration level
+
+**run.py**
+```python
+# Riviera specific flags
+lib.set_compile_option("rivierapro.vcom_flags", ["-coverage", "bs"])
+lib.set_compile_option("rivierapro.vlog_flags", ["-coverage", "bs"])
+
+# ModelSim specific flags
+lib.set_compile_option("modelsim.vcom_flags", ["+cover=bs"])
+lib.set_compile_option("modelsim.vlog_flags", ["+cover=bs"])
+
+# General purpose flag to enable coverage collection
+lib.set_sim_option("enable_coverage", True)
+```
+
+---
+
+# The output path
+- VUnit creates an unique output path folder for each test case
+
+- The output path can be used to write output data from the test bench
+
+- The output path is also accessible by the `post_check` Python function
+
+- VUnit also writes the full stdout of the test to `output.txt` within the output path
+
+```vhdl
+    -- The output path is given by calling a function on runner_cfg
+    report output_path(runner_cfg);
+```
+
+---
+
+# Pre- and post simulation hooks
+- **pre_config**: When you want to generate stimuli before simulation
+
+- **post_check**: When you want to check result data after simulation
+
+- The `output_path` can be used as an input/output folder
+
+```python
+def pre_config(output_path):
+    generate_stimuli(join(output_path, "stimuli.csv"))
+    return True
+
+def post_check(output_path):
+    check_result(join(output_path, "result.csv"))
+    return True
+
+test_bench.set_pre_config(pre_config)
+test_bench.set_post_check(post_check)
+```
+
+Each test bench or test configuration can have its own `pre_config`
+and `post_check` function.
+---
+
+# Parallel simulation
+- You can use the `-pN/--num-threads=N` flag to run `N` simulator
+processes in parallel
+
+- **Warning**: Your co-workers might not appreciate high `N` if you are using a
+commercial simulator with limited number of licenses
+
+---
+
+# Attributes
+- Custom user attributes can be set on test cases via comments
+
+- Attributes be used for requirements trace-ability
+  - Attributes for the entire project are exported to JSON using the `--export-json` flag
+
+- Attributes can also be used to mark test that take really long to
+run such that the CI-server only runs them at night and not on every commit.
+  - Test can be selected based using the `--{with,without}-attributes` command line argument.
+
+```vhdl
+if run("Test case") then
+  -- vunit: .req-111
+elsif run("Long test case") then
+  -- vunit: .nigthly
+end if;
+```
+
+---
+
+# Running several test in the same simulation
+
+- By default VUnit runs each test case within a test bench in an independent simulation
+   - To provide isolation
+   - To provide opportunity for parallelization
+
+- When unit-testing packages that have many small tests and little
+shared state that can cause problems it can be faster to run all tests
+in the same simulation to avoid simulator start-up overhead
+
+Use the `run_all_in_same_sim` attribute in the test bench.
+```vhdl
+-- vunit: run_all_in_same_sim
+entity tb_package is
+  ...
+```
+Tests will still have separate status report but all test will share
+output path and configuration
+---
+
+# CI-server integration
+- Use the `--xunit-xml` command line argument to write a test report
+file using the standard xml format that Jenkins and others support
+
+- You can also use the `--exit-0` command line argument to only set
+failing exit code if VUnit crashes and not just because a test failed
+  - This can be used to get a yellow build on test failure and red build on test environment failure
+
+<pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py --xunit-xml=test_results.xml
+...
+</pre>
+
+
+---
+
+# The libraries
+I will give an overview of the VHDL libraries included in VUnit
+
+- Logging
+
+- Check
+
+- Data Types
+
+- Com
+
+- Verification Components
+
+---
+
+# Logging
+
+- Write messages to stdout or file
+
+- Messages have a source and a log level
+
+- Sources can be hierarchical, separated by `:`
+
+- Simulation can be configured to stop after `N` log messages of specific level
+  - The default is to stop directly on any `ERROR` or `FAILURE`
+
+- Logging also be mocked to enable negative testing of verification components and packages
+
+<pre class="hljs remark-code">
+<font color="#56B6C2">0 ns</font> - <b>tb:monitor</b> -   <font color="#C678DD"><b>TRACE</b></font> - Trace message
+<font color="#56B6C2">2 ns</font> - <b>tb:monitor</b> -   <font color="#56B6C2"><b>DEBUG</b></font> - Debug message
+<font color="#56B6C2">2 ns</font> - <b>tb:stimuli</b> -    <b>INFO</b> - Info message
+<font color="#56B6C2">3 ns</font> - <b>tb:monitor</b> - <font color="#D19A66"><b>WARNING</b></font> - Warning message
+<font color="#56B6C2">4 ns</font> - <b>tb:checker</b> -   <font color="#E06C75"><b>ERROR</b></font> - Error message
+<font color="#56B6C2">4 ns</font> - <b>tb:checker</b> - <span style="background-color:#E06C75"><font color="#FFFFFF"><b>FAILURE</b></font></span> - Failure message
+</pre>
+
+---
+
+# Logging
+
+Creating log messages
+```vhdl
+process monitor is
+  constant logger : logger_t = get_logger("tb:monitor");
+begin
+  wait until stuff;
+  debug(logger, "Stuff happened");
+end;
+```
+
+The default logger can also be used
+```vhdl
+process monitor is
+begin
+  wait until stuff;
+  debug("Log to default logger");
+end;
+```
+
+---
+
+# Logging
+
+Configuring visibility
+
+```vhdl
+process main is
+begin
+  show(get_logger("tb:monitor"), display_handler, (trace, debug));
+  ...
+```
+
+Configuring stop condition
+
+```vhdl
+process main is
+begin
+  -- Stop after 1 warning in any logger under tb:*
+  set_stop_count(get_logger("tb"), warning, 1);
+  ...
+```
+
+---
+
+# Logging
+
+Negative testing using mocking
+
+```vhdl
+process main is
+  constant logger : logger_t := get_logger("my_pkg");
+begin
+
+  if run("test error on wrong input") then
+    -- Mock the logger to record calls to it
+    mock(logger, error);
+
+    -- Perform the call which should produce the error
+    mypkg.check_stuff(wrong_stuff);
+
+    -- Check that the one and only error occurred
+    check_only_log(logger, "Got the wrong stuff", error);
+
+    -- Need to unmock the logger here, VUnit will check that no logger
+    -- is mocked at the end of simulation
+    unmock(logger, error);
+  ...
+```
+
+Useful to people who write re-usable verification components and packages
+
+---
+
+# Check
+- Provides check subprogram such as `check_equal` with better output than `assert` statements
+  - Assert just tells you it failed unless you provide a message
+
+- Uses the logging library underneath
+
+- Can also log confirmation messages when the checks pass (turned-off by default)
+
+```vhdl
+    check_equal(my_data - 1, reference_value, result("for my_data"));
+    check_equal(my_data, reference_value, result("for my_data"));
+```
+
+<pre class="hljs remark-code">
+<font color="#56B6C2">0 ps</font> - <b>check</b> - <font color="#E06C75"><b>ERROR</b></font> - Equality check failed for my_data - Got 16. Expected 17.
+<font color="#56B6C2">0 ps</font> - <b>check</b> -  <font color="#98C379"><b>PASS</b></font> - Equality check passed for my_data - Got 17.
+</pre>
+
+---
+
+# Check
+- Provides many other subprograms such as `check_match`, `check_stable`, `check_one_hot` and many more...
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
