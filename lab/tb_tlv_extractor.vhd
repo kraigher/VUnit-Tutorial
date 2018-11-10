@@ -29,29 +29,46 @@ begin
   end process;
 
   monitor : block
-    procedure montior_tlv(logger : logger_t;
+
+    procedure monitor_tlv(logger : logger_t;
                           signal valid : in std_logic;
                           signal data : in byte_t) is
+
+      variable count : natural := 0;
+
+      impure function packet_string(tag : byte_t) return string is
+      begin
+        return "packet #" & to_string(count) & " with tag = " & to_hstring(tag);
+      end;
+
+      variable tag : byte_t;
       variable length : natural;
+
     begin
       loop
         wait until valid = '1' and rising_edge(clk);
-        info(logger, "New packet with tag = " & to_hstring(data));
+        tag := data;
+        info(logger, "Start of " & packet_string(tag));
 
         wait until valid = '1' and rising_edge(clk);
-        info(logger, "Packet length =" & to_string(to_integer(unsigned(data))));
+        length := to_integer(unsigned(data));
+        info(logger, "Packet length = " & to_string(length));
 
         for i in 0 to length-1 loop
           wait until valid = '1' and rising_edge(clk);
-          info(logger, "data(" & to_string(i) & ") = " & to_hstring(data));
+          debug(logger, "data(" & to_string(i) & ") = " & to_hstring(data));
         end loop;
 
-        info(logger, "End of packet");
+        debug(logger, "End of " & packet_string(tag));
+        count := count + 1;
       end loop;
     end;
-
   begin
+    monitor_tlv(get_logger("monitor:input"), in_tvalid, in_tdata);
+    monitor_tlv(get_logger("monitor:output"), out_tvalid, out_tdata);
   end block;
+
+  clk <= not clk after 5 ns;
 
   dut: entity work.tlv_extractor
     generic map (
