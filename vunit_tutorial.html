@@ -986,6 +986,50 @@ end process;
     - Allows code re-use also when developing the **VC**
   - Many **VC** also support a common synchronization **VCI** to wait for a specific amount of time between read/write transactions.
 
+---
+
+# Verification Components - Bus Master
+Supports read and write operations on a memory mapped bus
+
+```vhdl
+  constant axil_bus : bus_master_t := new_bus(
+    data_length => 32,
+    address_length => 32,
+    logger => get_logger("axi_bus"));
+  ...
+
+  -- Non-blocking write
+  write_bus(net, axil_bus, CONTROL_REG, ENABLE_BIT);
+  wait_until_idle(net, axil_bus);
+  check_equal(is_enabled, '1');
+
+  -- A blocking read
+  read_bus(net, axil_bus, STATUS_REG, read_data);
+  check_equal(read_data(ENABLE_BIT), '1');
+
+  ...
+
+  axi_lite_master_inst: entity vunit_lib.axi_lite_master
+    generic map (
+      bus_handle => axil_bus)
+    port map (
+      aclk => clk,
+      ...
+```
+---
+
+# Verification Components - Bus Master
+With debug logging enabled
+
+```vhdl
+  show(get_logger(axil_bus), display_handler, debug);
+```
+
+<pre class="hljs remark-code">
+<font color="#56B6C2">5000000 fs</font> - <b>axi_bus</b> -   <font color="#56B6C2"><b>DEBUG</b></font> - Wrote 0x00000001 to address 0x00000000
+<font color="#56B6C2">8000000 fs</font> - <b>axi_bus</b> -   <font color="#56B6C2"><b>DEBUG</b></font> - Read 0x00000001 from address 0x00000004
+</pre>
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
