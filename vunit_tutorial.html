@@ -769,7 +769,6 @@ Can be used to define stimuli and collect results in streaming test benches
 
 ---
 
-
 # Data types - Queue
 ```vhdl
 stimuli : process
@@ -797,6 +796,54 @@ begin
                                  result("for tuser"));
   end loop;
 end process
+```
+
+---
+
+# Data types - Integer Array
+- `integer_array_t` is a dynamic array of integers with up to three dimensions
+
+- Can load/store from CSV files or raw binary files
+
+```vhdl
+  -- One-dimensional array
+  arr := new_1d;
+  arr.append(11);
+  arr.append(22);
+  assert arr.get(1) = 22;
+
+  -- Two-dimensional array
+  arr := new_2d(width => 4, height => 4);
+  arr.set(0, 1, 22);
+  assert arr.get(0, 1) = 22;
+
+  -- Load and store from file
+  arr := load_csv("data.csv");
+  save_raw(arr, "data.raw");
+```
+
+---
+
+# Data types - Key Value Map
+- A `dict_t` type implements a key value map for strings.
+
+- Any data type can used when combined with the `codec_pkg`
+
+- The `codec_pkg` is also used for the `queue_t` and can encode/decode any primitive data type to/from string.
+
+```vhdl
+  dict := new_dict;
+
+  set(dict, "key", "value");
+  assert has_key(dict, "key");
+  assert not has_key(dict, "key2");
+  assert get(dict, "key") = "value";
+
+  remove(dict, "key");
+  assert not has_key(dict, "key");
+
+  set(dict, encode(1), encode(1 ns));
+  assert decode(get(dict, encode(1))) = 1 ns;
 ```
 
 
