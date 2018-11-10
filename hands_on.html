@@ -134,6 +134,34 @@ entity tlv_extractor is
   bench for a non-synthesizeable DUT and handle synthesis aspects
   while leaning on a good test bench
 
+---
+
+# Step 1
+
+- In the main process of the test bench implement a for loop which streams random data into the DUT.
+
+- Use OSVVM `RandomPkg` to create random data.
+
+- You are done when the test bench is <font color="#98C379"><b>green</b></font>
+
+```vhdl
+library osvvm;
+use osvvm.RandomPkg.all;
+
+...
+
+main : process
+  variable rnd : RandomPType;
+begin
+  ...
+
+  rnd.InitSeed(rnd'instance_name);
+  byte := rnd.RandSlv(0, 255, 8);
+
+  ...
+
+end process;
+```
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
