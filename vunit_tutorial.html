@@ -126,32 +126,33 @@ layout: true
 
 # What can VUnit do for you?
 
-- Provide a very convenient and productive edit/compile/run workflow.
+- Provide a very convenient and productive edit/compile/run workflow
 
 - Automatic compile order detection and incremental re-compilation
 
-- Automate and standardize the running of all test benches.
+- Automate and standardize the running of all test benches
 
-- Integration with Continous Integration servers such as Jenkins and Bamboo.
+- Integration with Continous Integration servers such as Jenkins and Bamboo
 
-- Provides you with a toolbox to create higher quality automated test benches.
+- Provides you with a toolbox to create higher quality automated test benches
 
-- Lowers the threshold to write automated tests.
+- Lowers the threshold to write automated tests
 
 ---
 
 # What is VUnit exactly?
 
-VUnit is a set of related components written in Python, VHDL and SystemVerilog.
+VUnit is a set of related components written in Python, VHDL and SystemVerilog
+
 The core parts are:
 
 - A Python library:
 
-  - Simple, documented and script-able API for end users.
-  - Test execution and results collection.
-  - Controlling and spawning of simulator processes.
+  - Simple, documented and script-able API for end users
+  - Test execution and results collection
+  - Controlling and spawning of simulator processes
 
-- A VHDL/SystemVerilog Test Runner.
+- A VHDL/SystemVerilog Test Runner
   - Allows test benches with multiple named test cases
 
 - A Logging/Check Library
@@ -161,7 +162,7 @@ The core parts are:
 ---
 
 # What is VUnit exactly?
-There are also a number of additional libraries.
+There are also a number of additional libraries
 
 - Dynamic Data Types Library
 
@@ -297,27 +298,27 @@ Elapsed time was 0.3 seconds
 ---
 
 # Multiple test cases
-VUnit supports having several test cases in a test bench.
+VUnit supports having several test cases in a test bench
 
 **tb_example_many.vhd**
 ```vhdl
-  main : process
-  begin
-    test_runner_setup(runner, runner_cfg);
+main : process
+begin
+  test_runner_setup(runner, runner_cfg);
 
-    while test_suite loop
+  while test_suite loop
 
-      if run("test_pass") then
-        report "This will pass";
+    if run("test_pass") then
+      report "This will pass";
 
-      elsif run("test_fail") then
-        assert false report "It fails";
+    elsif run("test_fail") then
+      assert false report "It fails";
 
-      end if;
-    end loop;
+    end if;
+  end loop;
 
-    test_runner_cleanup(runner);
-  end process;
+  test_runner_cleanup(runner);
+end process;
 ```
 
 ---
@@ -355,7 +356,7 @@ Elapsed time was 0.7 seconds
 # Launching the Simulator GUI
 
 Sometimes you want to use the simulator GUI to investigate why your
-test is <font color="#E06C75"><b>failing</b></font>.
+test is <font color="#E06C75"><b>failing</b></font>
 
 <pre class="hljs remark-code"><font color="black"><b>></b></font> python run.py lib.tb_example.all --gui &
 </pre>
@@ -417,38 +418,37 @@ I will give an overview of some important advanced features
 
 # Test runner watchdog
 
-Often a faulty DUT or test bench run forever. It thus good practice to add a timeout.
+Often a faulty DUT or test bench run forever. It thus good practice to add a timeout
 ```vhdl
-  test_runner : process
-  begin
-    test_runner_setup(runner, runner_cfg);
+test_runner : process
+begin
+  test_runner_setup(runner, runner_cfg);
 
-    while test_suite loop
-      if run("Test that stalls") then
-        -- The watchdog will fail this test in a reasonable time
-        wait;
-      elsif run("Test that needs longer timeout") then
-        -- It is also possible to set/re-set the timeout
-        -- when test cases need separate timeout settings
-        set_timeout(runner, 2 ms);
-        wait for 1 ms;
-      end if;
-    end loop;
+  while test_suite loop
+    if run("Test that stalls") then
+      -- The watchdog will fail this test in a reasonable time
+      wait;
+    elsif run("Test that needs longer timeout") then
+      -- It is also possible to set/re-set the timeout
+      -- when test cases need separate timeout settings
+      set_timeout(runner, 2 ms);
+      wait for 1 ms;
+    end if;
+  end loop;
 
-    test_runner_cleanup(runner);
-  end process;
+  test_runner_cleanup(runner);
+end process;
 
-  test_runner_watchdog(runner, 1 ns);
-
+test_runner_watchdog(runner, 1 ns);
 ```
 ---
 
 # Test configuration
 
 - For complex test benches or When developing re-usable IP blocks you
-may want to test them for several combination of generics.
+may want to test them for several combination of generics
 
-- VUnit supports running a test case several times with different configurations of generics.
+- VUnit supports running a test case several times with different configurations of generics
 
 **run.py**
 ```python
@@ -525,8 +525,8 @@ lib.set_sim_option("enable_coverage", True)
 - VUnit also writes the full stdout of the test to `output.txt` within the output path
 
 ```vhdl
-    -- The output path is given by calling a function on runner_cfg
-    report output_path(runner_cfg);
+-- The output path is given by calling a function on runner_cfg
+report output_path(runner_cfg);
 ```
 
 ---
@@ -552,7 +552,7 @@ test_bench.set_post_check(post_check)
 ```
 
 Each test bench or test configuration can have its own `pre_config`
-and `post_check` function.
+and `post_check` function
 ---
 
 # Parallel simulation
@@ -571,8 +571,8 @@ commercial simulator with limited number of licenses
   - Attributes for the entire project are exported to JSON using the `--export-json` flag
 
 - Attributes can also be used to mark test that take really long to
-run such that the CI-server only runs them at night and not on every commit.
-  - Test can be selected based using the `--{with,without}-attributes` command line argument.
+run such that the CI-server only runs them at night and not on every commit
+  - Test can be selected based using the `--{with,without}-attributes` command line argument
 
 ```vhdl
 if run("Test case") then
@@ -594,7 +594,7 @@ end if;
 shared state that can cause problems it can be faster to run all tests
 in the same simulation to avoid simulator start-up overhead
 
-Use the `run_all_in_same_sim` attribute in the test bench.
+Use the `run_all_in_same_sim` attribute in the test bench
 ```vhdl
 -- vunit: run_all_in_same_sim
 entity tb_package is
@@ -742,8 +742,8 @@ Useful to people who write re-usable verification components and packages
 - Can also log confirmation messages when the checks pass (turned-off by default)
 
 ```vhdl
-    check_equal(my_data - 1, reference_value, result("for my_data"));
-    check_equal(my_data, reference_value, result("for my_data"));
+check_equal(my_data - 1, reference_value, result("for my_data"));
+check_equal(my_data, reference_value, result("for my_data"));
 ```
 
 <pre class="hljs remark-code">
@@ -773,15 +773,15 @@ Provides dynamic data types such as:
   - Type mismatch is checked at runtime
 
 ```vhdl
-  queue := new_queue;
+queue := new_queue;
 
-  push_integer(queue, 11);
-  push_std_ulogic_vector(queue, b"0101");
-  push_string(queue, "Hello world");
+push_integer(queue, 11);
+push_std_ulogic_vector(queue, b"0101");
+push_string(queue, "Hello world");
 
-  assert pop_integer(queue) = 11;
-  assert pop_std_ulogic_vector(queue) = b"0101";
-  assert pop_string(queue) = "Hello world";
+assert pop_integer(queue) = 11;
+assert pop_std_ulogic_vector(queue) = b"0101";
+assert pop_string(queue) = "Hello world";
 ```
 
 Can be used to define stimuli and collect results in streaming test benches
@@ -825,44 +825,44 @@ end process
 - Can load/store from CSV files or raw binary files
 
 ```vhdl
-  -- One-dimensional array
-  arr := new_1d;
-  arr.append(11);
-  arr.append(22);
-  assert arr.get(1) = 22;
+-- One-dimensional array
+arr := new_1d;
+arr.append(11);
+arr.append(22);
+assert arr.get(1) = 22;
 
-  -- Two-dimensional array
-  arr := new_2d(width => 4, height => 4);
-  arr.set(0, 1, 22);
-  assert arr.get(0, 1) = 22;
+-- Two-dimensional array
+arr := new_2d(width => 4, height => 4);
+arr.set(0, 1, 22);
+assert arr.get(0, 1) = 22;
 
-  -- Load and store from file
-  arr := load_csv("data.csv");
-  save_raw(arr, "data.raw");
+-- Load and store from file
+arr := load_csv("data.csv");
+save_raw(arr, "data.raw");
 ```
 
 ---
 
 # Data types - Key Value Map
-- A `dict_t` type implements a key value map for strings.
+- A `dict_t` type implements a key value map for strings
 
 - Any data type can used when combined with the `codec_pkg`
 
-- The `codec_pkg` is also used for the `queue_t` and can encode/decode any primitive data type to/from string.
+- The `codec_pkg` is also used for the `queue_t` and can encode/decode any primitive data type to/from string
 
 ```vhdl
-  dict := new_dict;
+dict := new_dict;
 
-  set(dict, "key", "value");
-  assert has_key(dict, "key");
-  assert not has_key(dict, "key2");
-  assert get(dict, "key") = "value";
+set(dict, "key", "value");
+assert has_key(dict, "key");
+assert not has_key(dict, "key2");
+assert get(dict, "key") = "value";
 
-  remove(dict, "key");
-  assert not has_key(dict, "key");
+remove(dict, "key");
+assert not has_key(dict, "key");
 
-  set(dict, encode(1), encode(1 ns));
-  assert decode(get(dict, encode(1))) = 1 ns;
+set(dict, encode(1), encode(1 ns));
+assert decode(get(dict, encode(1))) = 1 ns;
 ```
 
 ---
@@ -981,10 +981,10 @@ end process;
 
   - The AXI4-master, RAM-master, Avalon-master and Wishbone-master all support a common generic bus master **VCI**
 
-    - Reduces code duplication as you can re-use code to read and write control registers even if you use different busses on module level and top level.
+    - Reduces code duplication as you can re-use code to read and write control registers even if you use different busses on module level and top level
 
     - Allows code re-use also when developing the **VC**
-  - Many **VC** also support a common synchronization **VCI** to wait for a specific amount of time between read/write transactions.
+  - Many **VC** also support a common synchronization **VCI** to wait for a specific amount of time between read/write transactions
 
 ---
 
@@ -1000,29 +1000,29 @@ end process;
 Supports read and write operations on a memory mapped bus
 
 ```vhdl
-  constant axil_bus : bus_master_t := new_bus(
-    data_length => 32,
-    address_length => 32,
-    logger => get_logger("axi_bus"));
-  ...
+constant axil_bus : bus_master_t := new_bus(
+  data_length => 32,
+  address_length => 32,
+  logger => get_logger("axi_bus"));
+...
 
-  -- Non-blocking write
-  write_bus(net, axil_bus, CONTROL_REG, ENABLE_BIT);
-  wait_until_idle(net, axil_bus);
-  check_equal(is_enabled, '1');
+-- Non-blocking write
+write_bus(net, axil_bus, CONTROL_REG, ENABLE_BIT);
+wait_until_idle(net, axil_bus);
+check_equal(is_enabled, '1');
 
-  -- A blocking read
-  read_bus(net, axil_bus, STATUS_REG, read_data);
-  check_equal(read_data(ENABLE_BIT), '1');
+-- A blocking read
+read_bus(net, axil_bus, STATUS_REG, read_data);
+check_equal(read_data(ENABLE_BIT), '1');
 
-  ...
+...
 
-  axi_lite_master_inst: entity vunit_lib.axi_lite_master
-    generic map (
-      bus_handle => axil_bus)
-    port map (
-      aclk => clk,
-      ...
+axi_lite_master_inst: entity vunit_lib.axi_lite_master
+  generic map (
+    bus_handle => axil_bus)
+  port map (
+    aclk => clk,
+    ...
 ```
 ---
 
@@ -1030,7 +1030,7 @@ Supports read and write operations on a memory mapped bus
 With debug logging enabled
 
 ```vhdl
-  show(get_logger(axil_bus), display_handler, debug);
+show(get_logger(axil_bus), display_handler, debug);
 ```
 
 <pre class="hljs remark-code">
@@ -1062,31 +1062,31 @@ With debug logging enabled
 # Verification Components - Memory model
 
 ```vhdl
-  constant memory := new_memory(endian => little_endian);
-  constant axi_rd_slave : axi_slave_t := new_axi_slave(
-    memory => memory,
-    logger => get_logger("axi_rd_slave"));
-  ...
+constant memory := new_memory(endian => little_endian);
+constant axi_rd_slave : axi_slave_t := new_axi_slave(
+  memory => memory,
+  logger => get_logger("axi_rd_slave"));
+...
 
-  buf := allocate(memory, 4 * stimuli'length, "My Buffer",
-                  permissions => read_only);
+buf := allocate(memory, 4 * stimuli'length, "My Buffer",
+                permissions => read_only);
 
-  -- Write stimuli data to memory
-  for i in stimuli'length loop
-    -- Uses default endian for memory but can be overridden
-    write_word(memory, base_address(buf) + 4*i, stimuli(i));
-  end loop;
+-- Write stimuli data to memory
+for i in stimuli'length loop
+  -- Uses default endian for memory but can be overridden
+  write_word(memory, base_address(buf) + 4*i, stimuli(i));
+end loop;
 
-  -- Write input address to control register
-  write_bus(net, ctrl_reg_bus, INPUT_ADDR, base_address(buf));
+-- Write input address to control register
+write_bus(net, ctrl_reg_bus, INPUT_ADDR, base_address(buf));
 
-  ...
+...
 
-  axi_read_slave_inst: entity vunit_lib.axi_read_slave
-    generic map (
-      axi_slave => axi_rd_slave)
-    port map (
-      aclk    => clk,
+axi_read_slave_inst: entity vunit_lib.axi_read_slave
+  generic map (
+    axi_slave => axi_rd_slave)
+  port map (
+    aclk    => clk,
 ```
 
 ---
@@ -1139,7 +1139,16 @@ With debug logging enabled
 
 # Verification Components - More examples
 
-Have a look at the [AXI DMA](https://github.com/VUnit/vunit/tree/master/examples) example which demonstrates the use of AXI read and write slaves as well as control register access using bus master **VCI**.
+Have a look at the [AXI DMA](https://github.com/VUnit/vunit/tree/master/examples) example which demonstrates the use of AXI read and write slaves as well as control register access using bus master **VCI**
+
+---
+layout: true
+---
+
+class: center, middle
+
+<img class="vunit-logo", src="vunit.svg" alt="VUnit logo"/>
+# Thank you for listening!
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
