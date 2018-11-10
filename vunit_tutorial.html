@@ -1061,6 +1061,38 @@ With debug logging enabled
 
 # Verification Components - Memory model
 
+```vhdl
+  constant memory := new_memory(endian => little_endian);
+  constant axi_rd_slave : axi_slave_t := new_axi_slave(
+    memory => memory,
+    logger => get_logger("axi_rd_slave"));
+  ...
+
+  buf := allocate(memory, 4 * stimuli'length, "My Buffer",
+                  permissions => read_only);
+
+  -- Write stimuli data to memory
+  for i in stimuli'length loop
+    -- Uses default endian for memory but can be overridden
+    write_word(memory, base_address(buf) + 4*i, stimuli(i));
+  end loop;
+
+  -- Write input address to control register
+  write_bus(net, ctrl_reg_bus, INPUT_ADDR, base_address(buf));
+
+  ...
+
+  axi_read_slave_inst: entity vunit_lib.axi_read_slave
+    generic map (
+      axi_slave => axi_rd_slave)
+    port map (
+      aclk    => clk,
+```
+
+---
+
+# Verification Components - Memory model
+
 - Buffers can be named for better error messages
 
 - Error message will include:
