@@ -1107,6 +1107,39 @@ With debug logging enabled
     Got 200 expected 13
 </pre>
 
+---
+
+# Verification Components - AXI slaves
+- Uses the memory model
+
+- Each AXI-channel has run-time configurable fifo depth
+
+- Each AXI-channel has run-time configurable stall probability
+
+- AXI response channels have run-time configurable min/max latency
+
+- Records transfer statistics such as num burst, burst length histogram
+
+- Provides debug logging for each burst
+
+- **Future work**: Error injection for specific bursts
+
+<pre class="hljs remark-code">
+<font color="#56B6C2">30500 ps</font> - <b>axi_rd_s</b> - <font color="#56B6C2"><b>DEBUG</b></font> - Got read burst #1 for id 0
+                              arid    = 0x0
+                              araddr  = 0x00001000
+                              arlen   = 62
+                              arsize  = 4
+                              arburst = incr (01)
+<font color="#56B6C2">30500 ps</font> - <b>axi_rd_s</b> - <font color="#56B6C2"><b>DEBUG</b></font> - Start providing data for read burst #1 for id 0
+<font color="#56B6C2">92500 ps</font> - <b>axi_rd_s</b> - <font color="#56B6C2"><b>DEBUG</b></font> - Providing last data for read burst #1 for id 0
+</pre>
+
+---
+
+# Verification Components - More examples
+
+Have a look at the [AXI DMA](https://github.com/VUnit/vunit/tree/master/examples) example which demonstrates the use of AXI read and write slaves as well as control register access using bus master **VCI**.
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
