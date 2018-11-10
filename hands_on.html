@@ -85,6 +85,10 @@ layout: true
 
 - The steps will lead to a working & verified DUT
 
+- I hope everyone will have time to complete the basic steps
+
+- After the basic steps there are a few stretch goals for the faster participants
+
 ---
 
 # The Task
@@ -126,6 +130,8 @@ entity tlv_extractor is
 ---
 
 # Some advice
+- Follow the steps, it is the point of the lab
+
 - Do **not** focus on synthesis aspects of the DUT
 
   - Foremost since this is simple lab with limited time
@@ -140,28 +146,30 @@ entity tlv_extractor is
 
 - In the main process of the test bench implement a for loop which streams random data into the DUT.
 
+    - The data has to be complete legal **TLV** packets
+
 - Use OSVVM `RandomPkg` to create random data.
 
-- You are done when the test bench is <font color="#98C379"><b>green</b></font>
+- You are done when the test bench is <font color="#98C379"><b>green</b></font>, the DUT is not touched
 
 ```vhdl
 library osvvm;
 use osvvm.RandomPkg.all;
-
 ...
-
 main : process
   variable rnd : RandomPType;
 begin
   ...
-
   rnd.InitSeed(rnd'instance_name);
   byte := rnd.RandSlv(0, 255, 8);
-
   ...
-
 end process;
 ```
+
+---
+
+# Step 2
+
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
