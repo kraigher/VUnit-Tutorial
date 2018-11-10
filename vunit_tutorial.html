@@ -737,6 +737,69 @@ Useful to people who write re-usable verification components and packages
 # Check
 - Provides many other subprograms such as `check_match`, `check_stable`, `check_one_hot` and many more...
 
+---
+
+# Data types
+Provides dynamic data types such as:
+- Queue
+- Integer Array
+- Key Value Map
+
+---
+
+# Data types - Queue
+- The `queue_t` data type can push and pop any primitive VHDL value
+
+- Values of different types can be in the same queue
+  - Type mismatch is checked at runtime
+
+```vhdl
+  queue := new_queue;
+
+  push_integer(queue, 11);
+  push_std_ulogic_vector(queue, b"0101");
+  push_string(queue, "Hello world");
+
+  assert pop_integer(queue) = 11;
+  assert pop_std_ulogic_vector(queue) = b"0101";
+  assert pop_string(queue) = "Hello world";
+```
+
+Can be used to define stimuli and collect results in streaming test benches
+
+---
+
+
+# Data types - Queue
+```vhdl
+stimuli : process
+begin
+  while not is_empty(queue) loop
+     axis_m2s.t_valid <= '1';
+     axis_m2s.t_data <= pop_std_ulogic_vector(queue);
+     axis_m2s.t_user <= pop_std_ulogic_vector(queue);
+
+     wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
+                 and rising_edge(clk);
+
+     axis_m2s.t_valid <= '0';
+  end loop;
+end process;
+
+checker : process
+begin
+  while not is_empty(queue) loop
+    wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
+                and rising_edge(clk);
+    check_equal(axis_m2s.t_data, pop_std_ulogic_vector(queue),
+                                 result("for tdata"));
+    check_equal(axis_m2s.t_user, pop_std_ulogic_vector(queue),
+                                 result("for tuser"));
+  end loop;
+end process
+```
+
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
