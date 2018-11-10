@@ -988,6 +988,14 @@ end process;
 
 ---
 
+# Verification Components - Some Highlights
+
+- Bus Master
+- Memory model
+- AXI read/write slaves
+
+---
+
 # Verification Components - Bus Master
 Supports read and write operations on a memory mapped bus
 
@@ -1029,6 +1037,44 @@ With debug logging enabled
 <font color="#56B6C2">5000000 fs</font> - <b>axi_bus</b> -   <font color="#56B6C2"><b>DEBUG</b></font> - Wrote 0x00000001 to address 0x00000000
 <font color="#56B6C2">8000000 fs</font> - <b>axi_bus</b> -   <font color="#56B6C2"><b>DEBUG</b></font> - Read 0x00000001 from address 0x00000004
 </pre>
+
+---
+
+# Verification Components - Memory model
+
+- Memory mapped slaves interact with a memory model
+
+- The test bench designer can allocate buffers in the memory model
+  - Set permissions on addresses
+     - Read-only
+     - Read-and-Write
+     - Write-only
+     - No-access
+
+  - Write stimuli data to the memory addresses
+
+  - Write expected data to the memory addresses
+
+  - Read result data from memory
+
+---
+
+# Verification Components - Memory model
+
+- Buffers can be named for better error messages
+
+- Error message will include:
+  - Buffer buffer name if available
+  - Absolute address
+  - Relative address within the buffer if available
+
+<pre class="hljs remark-code">
+<font color="#56B6C2">96500000 fs</font> - <b>axi_wr_slave</b> - <span style="background-color:#E06C75"><b><font color="#FFFFFF">FAILURE</b></font></span> -
+    Writing to address 8194
+    at offset 2 within buffer &apos;wbuffer&apos; at range (8192 to 9215).
+    Got 200 expected 13
+</pre>
+
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
