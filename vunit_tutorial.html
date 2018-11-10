@@ -404,7 +404,7 @@ I will give an overview of some important advanced features
 
 - The output path
 
-- Pre and post simulation hooks
+- Pre- and post simulation hooks
 
 - Parallel simulation
 
@@ -445,7 +445,7 @@ test_runner_watchdog(runner, 1 ns);
 
 # Test configuration
 
-- For complex test benches or When developing re-usable IP blocks you
+- For complex test benches or when developing re-usable IP blocks you
 may want to test them for several combination of generics
 
 - VUnit supports running a test case several times with different configurations of generics
@@ -461,7 +461,7 @@ for data_width in [8, 16, 32]:
         # Each configuration needs an unique name
         name = "dw=%i,mode=%s" % (data_width, mode)
 
-        # Create the generics as a key-valu map
+        # Create the generics as a key-value map
         generics = dict(data_width=data_width, mode=mode)
 
         # Add the configuration
@@ -981,7 +981,7 @@ end process;
 
   - The AXI4-master, RAM-master, Avalon-master and Wishbone-master all support a common generic bus master **VCI**
 
-    - Reduces code duplication as you can re-use code to read and write control registers even if you use different busses on module level and top level
+    - Reduces code duplication as you can re-use code to read and write control registers even if you use different buses on module level and top level
 
     - Allows code re-use also when developing the **VC**
   - Many **VC** also support a common synchronization **VCI** to wait for a specific amount of time between read/write transactions
@@ -1112,13 +1112,13 @@ axi_read_slave_inst: entity vunit_lib.axi_read_slave
 # Verification Components - AXI slaves
 - Uses the memory model
 
-- Each AXI-channel has run-time configurable fifo depth
+- Each AXI-channel has run-time configurable FIFO depth
 
 - Each AXI-channel has run-time configurable stall probability
 
 - AXI response channels have run-time configurable min/max latency
 
-- Records transfer statistics such as num burst, burst length histogram
+- Records transfer statistics such as number of burst and burst length histogram
 
 - Provides debug logging for each burst
 
