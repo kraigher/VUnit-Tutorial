@@ -191,6 +191,19 @@ architecture tb of tb_tlv_extractor is
 begin
 ```
 
+---
+
+# Step 3 - Make it pass
+- Implement enough code in the DUT to make the test bench from step 2 <font color="#98C379"><b>pass</b></font>
+
+---
+
+# Step 4 - Refactor
+
+- Create a dedicated stimuli process
+
+- Use another `queue_t` to pass data from the main process to the stimuli process
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
