@@ -142,7 +142,7 @@ entity tlv_extractor is
 
 ---
 
-# Step 1
+# Step 1 - Stimuli
 
 - In the main process of the test bench implement a for loop which streams random data into the DUT.
 
@@ -150,7 +150,7 @@ entity tlv_extractor is
 
 - Use OSVVM `RandomPkg` to create random data.
 
-- You are done when the test bench is <font color="#98C379"><b>green</b></font>, the DUT is not touched
+- You are done when the test bench is <font color="#98C379"><b>passing</b></font>, the DUT is not touched
 
 ```vhdl
 library osvvm;
@@ -168,8 +168,28 @@ end process;
 
 ---
 
-# Step 2
+# Step 2 - Data checking
 
+- Create a data checker process that consumes the output stream
+  - Check that **all** data is passed through to the output for now
+
+- Use a `queue_t` to pass data from main process to the checker process
+
+- Add wait for empty queue to the main process
+
+- Add `test_runner_watchdog` to fail the test bench with timeout due to no output from the DUT
+
+- You are done when the test bench is <font color="#E06C75"><b>failing</b></font>, the DUT is not touched
+
+
+```vhdl
+library vunit_lib;
+context vunit_lib.data_types_context;
+
+architecture tb of tb_tlv_extractor is
+   constant queue : queue_t := new_queue;
+begin
+```
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
