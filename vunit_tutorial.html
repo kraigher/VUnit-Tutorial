@@ -609,7 +609,7 @@ I will give an overview of the VHDL libraries included in VUnit
 
 - Data Types
 
-- Com
+- Communication
 
 - Verification Components
 
@@ -844,6 +844,79 @@ end process
 
   set(dict, encode(1), encode(1 ns));
   assert decode(get(dict, encode(1))) = 1 ns;
+```
+
+---
+
+# Communication
+- The `com` library can be used for inter process communication in zero simulation time
+
+- Messages are created using the `queue_t` interface
+
+- Each message has a user defined message type
+
+- Based on the asynchronous actor model
+
+- Supports request/response and publish/subscribe patterns
+
+- Main use case is to create re-usable verification for complex test benches
+
+
+---
+
+# Communication
+** Request/Response example - master**
+```vhdl
+constant bus_read_msg : msg_type_t := new_msg_type("bus read");
+constant bfm_actor := new_actor("bus_bfm");
+...
+
+main : process
+  variable request_msg, reply_msg : msg_t;
+begin
+  -- This would be extracted to a read[address, data] procedure
+
+  request_msg := new_msg(bus_read_msg);
+  push(request_msg, addr);
+  send(net, bfm_actor, request_msg);
+
+  receive_reply(net, request_msg, reply_msg);
+  info("Read data " & to_string(pop(reply_msg)));
+
+  delete(reply_msg);
+end process;
+
+```
+
+---
+
+# Communication
+** Request/Response example - slave**
+```vhdl
+bus_bfm : process
+  variable request_msg, reply_msg : msg_t;
+begin
+  receive(net, bfm_actor, request_msg);
+
+  msg_type := message_type(request_msg);
+  if msg_type = bus_read_msg then
+    -- A more advanced BFM would pipeline reads
+    read_enable <= '1';
+    addr <= pop(request_msg);
+    wait until rising_edge(clk);
+    read_enable <= '0';
+    wait until rising_edge(clk);
+
+    reply_msg := new_msg;
+    push_std_ulogic_vector(reply_msg, read_data);
+    reply(net, request_msg, reply_msg);
+    delete(request_msg);
+  else
+    unexpected_msg_type(msg_type);
+  end if;
+
+end process;
+
 ```
 
 
