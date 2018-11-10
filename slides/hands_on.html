@@ -112,7 +112,7 @@ single byte *tag* and *length* fields followed by a *value* of
 entity tlv_extractor is
   generic (
     -- The tag to extract
-    tag : std_logic_vector(7 downto 0);
+    tag : std_logic_vector(7 downto 0)
   );
   port (
     clk : in std_logic;
@@ -125,6 +125,7 @@ entity tlv_extractor is
     out_tvalid : out std_logic;
     out_tdata : out std_logic_vector(7 downto 0)
   );
+end entity;
 ```
 
 ---
