@@ -97,11 +97,11 @@ layout: true
 
 - A **TLV** stream consists of variable sized packets with
 single byte *tag* and *length* fields followed by a *value* of
-*length* bytes
+*length* (0-255) bytes
 
 - The `tlv_extractor` should consume a **TLV**-stream one byte at a time
 
-- The `tlv_extractor` should output a new **TLV**-stream for a specific *tag* only and other *tags*
+- The `tlv_extractor` should output a new **TLV**-stream for a specific *tag* only and ignore other *tags*
 
 - The tlv_extractor has a generic defining the *tag* to extract
 
@@ -150,7 +150,7 @@ entity tlv_extractor is
 
 - Use OSVVM `RandomPkg` to create random data.
 
-- You are done when the test bench is <font color="#98C379"><b>passing</b></font>, the DUT is not touched
+- You are done when the test bench is <font color="#98C379"><b>passing</b></font>, the DUT is not touched in this step
 
 ```vhdl
 library osvvm;
@@ -171,7 +171,7 @@ end process;
 # Step 2 - Data checking
 
 - Create a data checker process that consumes the output stream
-  - Check that **all** data is passed through to the output for now
+  - Check that the DUT extracts **all** data through to the output for now
 
 - Use a `queue_t` to pass data from main process to the checker process
 
@@ -179,7 +179,7 @@ end process;
 
 - Add `test_runner_watchdog` to fail the test bench with timeout due to no output from the DUT
 
-- You are done when the test bench is <font color="#E06C75"><b>failing</b></font>, the DUT is not touched
+- You are done when the test bench is <font color="#E06C75"><b>failing</b></font>, the DUT is not touched in this step
 
 
 ```vhdl
@@ -194,7 +194,7 @@ begin
 ---
 
 # Step 3 - Make it pass
-- Implement enough code in the DUT to make the test bench from step 2 <font color="#98C379"><b>pass</b></font>
+- Implement enough code in the DUT to <font color="#98C379"><b>pass</b></font> the test bench from the previous step and **no** more
 
 ---
 
@@ -203,6 +203,94 @@ begin
 - Create a dedicated stimuli process
 
 - Use another `queue_t` to pass data from the main process to the stimuli process
+
+- Synchronize with the stimuli and checker queues being empty in the main process
+
+- Test bench should still <font color="#98C379"><b>pass</b></font>
+---
+
+# Step 5 - Refactor some more
+
+- Refactor data generation code into a procedure in the main process
+
+- Test bench should still <font color="#98C379"><b>pass</b></font>
+
+```vhdl
+procedure create_tlv_data(tag : std_logic_vector(7 downto 0),
+                          length : natural);
+```
+
+---
+
+# Step 6 - Make a named test case
+
+- Add a `should_extract` Boolean argument to the `create_tlv_data` procedure
+  - Data is only pushed to the checker queue if `should_extract` is true
+
+- Create a new test case called *"Test all packets are extracted"*
+
+- Use `create_tlv_data` to create a few packets **all** containing the *extraction_tag*
+
+- Test bench should still <font color="#98C379"><b>pass</b></font> since all data is extracted by the DUT
+
+```vhdl
+if run("Test all packets are extracted") then
+  -- Add a few packets, all with the extraction tag
+  create_tlv_data(tag => extraction_tag, length => 11,
+                  should_extract => true);
+  ...
+end if;
+```
+
+---
+
+# Step 7 - Add a failing test
+
+- Create a new test case called *"Test not all packets are extracted"*
+
+- Use `create_tlv_data` to create a few packets where some do not contain the *extraction_tag*
+
+```vhdl
+elsif run("Test not all packets are extracted") then
+  -- Add a few packets, some with the extraction tag and some without
+  create_tlv_data(tag => not extraction_tag, length => 11,
+                  should_extract => false);
+  ...
+end if;
+```
+
+- You are done when the test bench is <font color="#E06C75"><b>failing</b></font> sincethe DUT will extract everything
+
+---
+
+# Step 8 - Make it pass
+- Implement enough code in the DUT to <font color="#98C379"><b>pass</b></font> the test bench from the previous step
+
+---
+
+# Are you done?
+- Will it work for zero length values?
+
+- Will it work with `in_tvalid` low during random gaps?
+
+- Will it work for the maximum length value?
+
+---
+
+# Stretch goals
+- Add named directed tests for corner cases
+
+  - Zero length
+
+  - Maximum length
+
+  - Sequence of zero length non-extracted and extracted tags
+
+- Add test named *"Test random"* which will push a large number of random packets into the DUT
+
+- Add a test named *"Test random in_tvalid"* which will have random gaps with in_tvalid low
+
+Did you find any defects with the additional tests?
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
