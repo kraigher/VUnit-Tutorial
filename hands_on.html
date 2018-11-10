@@ -97,10 +97,9 @@ single byte *tag* and *length* fields followed by a *value* of
 
 - The `tlv_extractor` should consume a **TLV**-stream one byte at a time
 
-- The `tlv_extractor` should output a new **TLV**-stream for a subset of the *tags*
-   - Other *tags* should be ignored
+- The `tlv_extractor` should output a new **TLV**-stream for a specific *tag* only and other *tags*
 
-- The tlv_extractor has a generic `integer_vector` defining the *subset* of tags to output
+- The tlv_extractor has a generic defining the *tag* to extract
 
 ---
 
@@ -108,8 +107,8 @@ single byte *tag* and *length* fields followed by a *value* of
 ```vhdl
 entity tlv_extractor is
   generic (
-    -- The tags to extract
-    tags : integer_vector;
+    -- The tag to extract
+    tag : std_logic_vector(7 downto 0);
   );
   port (
     clk : in std_logic;
@@ -122,7 +121,18 @@ entity tlv_extractor is
     out_tvalid : out std_logic;
     out_tdata : out std_logic_vector(7 downto 0)
   );
-````
+```
+
+---
+
+# Some advice
+- Do **not** focus on synthesis aspects of the DUT
+
+  - Foremost since this is simple lab with limited time
+
+  - Also it is often a good workflow to first create a complete test
+  bench for a non-synthesizeable DUT and handle synthesis aspects
+  while leaning on a good test bench
 
 
     </textarea>
