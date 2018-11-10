@@ -916,9 +916,56 @@ begin
   end if;
 
 end process;
-
 ```
 
+---
+
+# Verification Components
+
+- Provides verification components for several bus standards
+
+  - AXI-stream
+
+  - AXI4-lite
+
+  - AXI4 master/slave
+
+  - Avalon source/sink
+
+  - Avalon master/slave
+
+  - Wishbone master/slave
+
+  - RAM master
+
+  - ...
+
+- The AXI4 master/slaves have been used to make a simulation model of Xilinx Zynq PS
+
+---
+
+# Verification Components - Terminology
+
+- Verification Component (**VC**)
+
+  - An entity that drives actual signals with stimuli and/or collects/checks expected values
+
+  - Supports one or more Verification Component Interfaces (**VCI**)
+
+---
+
+# Verification Components - Terminology
+
+- Verification Component Interface (**VCI**)
+
+  - A set of procedures defining the requests and messages which can be sent to/from a **VC**
+
+  - The AXI4-master, RAM-master, Avalon-master and Wishbone-master all support a common generic bus master **VCI**
+
+    - Reduces code duplication as you can re-use code to read and write control registers even if you use different busses on module level and top level.
+
+    - Allows code re-use also when developing the **VC**
+  - Many **VC** also support a common synchronization **VCI** to wait for a specific amount of time between read/write transactions.
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
