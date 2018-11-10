@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VUnit Hands-On</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body { font-family: 'Droid Serif'; }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: normal;
+      }
+
+      .remark-code, .remark-inline-code {
+          font-family: 'Ubuntu Mono';
+      }
+      .vunit-logo {
+          border-radius: 6%;
+          width: 30%;
+      }
+
+      div.my-header img {
+	        width: 5%;
+          border-radius: 6%;
+	        top: 2%;
+	        right: 2%;
+	        position: fixed;
+      }
+
+      div.my-footer {
+          border-top: 1px solid #ccc;
+          font-size: 10pt;
+	        text-align: center;
+	        position: fixed;
+	        bottom: 0px;
+	        left: 0px;
+	        height: 6%;
+	        width: 100%;
+      }
+
+      div.my-footer p {
+          margin-top: 10px;
+          height: 30px;
+      }
+
+      .gui-image {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 80%;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+<img class="vunit-logo", src="vunit.svg" alt="VUnit logo"/>
+# VUnit Hands-On
+
+**Tutor:** Olof Kraigher <olof.kraigher@gmail.com>
+
+---
+
+layout: true
+<div class="my-header"><img src="vunit.svg" /></div>
+<div class="my-footer">
+  <p>Olof Kraigher <a href="mailto:olof.kraigher@gmail.com">olof.kraigher@gmail.com</a>
+</p>
+</div>
+---
+
+# Hand-On
+
+- The goal is to give you a feel for a test-driven workflow using VUnit
+
+- You will be given:
+  1. A simple task
+  1. A skeleton Test Bench and DUT
+  1. A set of incremental steps to perform
+
+- The steps will lead to a working & verified DUT
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
