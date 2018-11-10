@@ -52,7 +52,7 @@ begin
 
         wait until valid = '1' and rising_edge(clk);
         length := to_integer(unsigned(data));
-        info(logger, "Packet length = " & to_string(length));
+        debug(logger, "Packet length = " & to_string(length));
 
         for i in 0 to length-1 loop
           wait until valid = '1' and rising_edge(clk);
