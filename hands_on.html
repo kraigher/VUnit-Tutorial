@@ -85,6 +85,46 @@ layout: true
 
 - The steps will lead to a working & verified DUT
 
+---
+
+# The Task
+
+- Implement a Tag-Length-Value (**TLV**) stream extractor (`tlv_extractor`)
+
+- A **TLV** stream consists of variable sized packets with
+single byte *tag* and *length* fields followed by a *value* of
+*length* bytes
+
+- The `tlv_extractor` should consume a **TLV**-stream one byte at a time
+
+- The `tlv_extractor` should output a new **TLV**-stream for a subset of the *tags*
+   - Other *tags* should be ignored
+
+- The tlv_extractor has a generic `integer_vector` defining the *subset* of tags to output
+
+---
+
+# TLV Extractor
+```vhdl
+entity tlv_extractor is
+  generic (
+    -- The tags to extract
+    tags : integer_vector;
+  );
+  port (
+    clk : in std_logic;
+
+    -- Input stream of bytes
+    in_tvalid : in std_logic;
+    in_tdata : in std_logic_vector(7 downto 0);
+
+    -- Output stream of extracted bytes
+    out_tvalid : out std_logic;
+    out_tdata : out std_logic_vector(7 downto 0)
+  );
+````
+
+
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
