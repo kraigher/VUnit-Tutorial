@@ -176,6 +176,8 @@ end process;
 
 - Use a `queue_t` to pass data from main process to the checker process
 
+- Use `check_equal` to check the values
+
 - Add wait for empty queue to the main process
 
 - Add `test_runner_watchdog` to fail the test bench with timeout due to no output from the DUT
@@ -188,7 +190,7 @@ library vunit_lib;
 context vunit_lib.data_types_context;
 
 architecture tb of tb_tlv_extractor is
-   constant queue : queue_t := new_queue;
+   constant checker_queue : queue_t := new_queue;
 begin
 ```
 
