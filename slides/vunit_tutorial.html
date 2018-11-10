@@ -792,29 +792,27 @@ Can be used to define stimuli and collect results in streaming test benches
 ```vhdl
 stimuli : process
 begin
-  while not is_empty(queue) loop
-     axis_m2s.t_valid <= '1';
-     axis_m2s.t_data <= pop_std_ulogic_vector(queue);
-     axis_m2s.t_user <= pop_std_ulogic_vector(queue);
-
-     wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
-                 and rising_edge(clk);
-
-     axis_m2s.t_valid <= '0';
+  while is_empty(queue) loop
+    wait until rising_edge(clk);
   end loop;
+
+  axis_m2s.t_valid <= '1';
+  axis_m2s.t_data <= pop_std_ulogic_vector(queue);
+
+  wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
+              and rising_edge(clk);
+
+  axis_m2s.t_valid <= '0';
 end process;
 
 checker : process
 begin
-  while not is_empty(queue) loop
-    wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
-                and rising_edge(clk);
-    check_equal(axis_m2s.t_data, pop_std_ulogic_vector(queue),
-                                 result("for tdata"));
-    check_equal(axis_m2s.t_user, pop_std_ulogic_vector(queue),
-                                 result("for tuser"));
-  end loop;
-end process
+  wait until (axis_m2s.t_valid and axis_s2m.t_ready) = '1'
+              and rising_edge(clk);
+  check_false(is_empty(queue), "Got unexpected data");
+  check_equal(axis_m2s.t_data, pop_std_ulogic_vector(queue),
+                               result("for tdata"));
+end process;
 ```
 
 ---
