@@ -38,7 +38,7 @@ begin
 
       impure function packet_string(tag : byte_t) return string is
       begin
-        return "packet #" & to_string(count) & " with tag = " & to_hstring(tag);
+        return "packet #" & to_string(count) & " with tag = " & to_string(to_integer(unsigned(tag)));
       end;
 
       variable tag : byte_t;
@@ -56,7 +56,7 @@ begin
 
         for i in 0 to length-1 loop
           wait until valid = '1' and rising_edge(clk);
-          debug(logger, "data(" & to_string(i) & ") = " & to_hstring(data));
+          debug(logger, "data(" & to_string(i) & ") = " & to_string(to_integer(unsigned(data))));
         end loop;
 
         debug(logger, "End of " & packet_string(tag));
