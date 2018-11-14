@@ -418,7 +418,7 @@ I will give an overview of some important advanced features
 
 # Test runner watchdog
 
-Often a faulty DUT or test bench run forever. It thus good practice to add a timeout
+Often a faulty DUT or test bench hangs, so add a watchdog timeout
 ```vhdl
 test_runner : process
 begin
@@ -445,7 +445,7 @@ test_runner_watchdog(runner, 1 ns);
 
 # Test configuration
 
-- For complex test benches or when developing re-usable IP blocks you
+- For complex test benches or re-usable IP blocks you
 may want to test them for several combination of generics
 
 - VUnit supports running a test case several times with different configurations of generics
@@ -487,7 +487,7 @@ lib.tb_generic.dw=32,mode=b.Test 2
 Listed 12 tests
 </pre>
 
-Configurations can be created both at test bench or test case granularity
+Configurations are also possible at the test case granularity
 
 ---
 
@@ -567,7 +567,7 @@ commercial simulator with limited number of licenses
 # Attributes
 - Custom user attributes can be set on test cases via comments
 
-- Attributes be used for requirements trace-ability
+- Attributes can be used for requirements trace-ability
   - Attributes for the entire project are exported to JSON using the `--export-json` flag
 
 - Attributes can also be used to mark test that take really long to
@@ -642,7 +642,7 @@ I will give an overview of the VHDL libraries included in VUnit
 
 - Sources can be hierarchical, separated by `:`
 
-- Simulation can be configured to stop after `N` log messages of specific level
+- Simulation can be configured to stop after `N` log messages of specific level and source
   - The default is to stop directly on any `ERROR` or `FAILURE`
 
 - Logging also be mocked to enable negative testing of verification components and packages
@@ -977,7 +977,7 @@ end process;
 
   - A set of procedures defining the requests and messages which can be sent to/from a **VC**
 
-  - The AXI4-master, RAM-master, Avalon-master and Wishbone-master all support a common generic bus master **VCI**
+  - The AXI4-master, RAM-master, Avalon-master and Wishbone-master all support a generic bus master **VCI**
 
     - Reduces code duplication as you can re-use code to read and write control registers even if you use different buses on module level and top level
 
